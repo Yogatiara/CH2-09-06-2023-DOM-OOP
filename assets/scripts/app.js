@@ -12,6 +12,12 @@ class ProductItem {
     this.product = product;
   }
 
+  addToCart() {
+    // console.log(this.product);
+    App.addProductToCart(this.product);
+
+  }
+
   render() {
     const prodEl = document.createElement('li');
     prodEl.className = 'product-item';
@@ -25,8 +31,49 @@ class ProductItem {
             <button>Tambah ke keranjang!</button>
           </div>
         </div>
-      `;
+    `;
+    const addToCartButton = prodEl.querySelector('button');
+    addToCartButton.addEventListener('click', this.addToCart.bind(this))
     return prodEl;
+  }
+}
+class ShoppingCart {
+  items = [];
+
+  set cartItems(value) {
+    this.items = value;
+    this.totalOutput.innerHTML = `<h2>Total: Rp.${this.totalAmount}</h2>`
+
+
+  }
+
+  get totalAmount() {
+    const sum = this.items.reduce((prevValue, curItem) => {
+      return prevValue + curItem.price;
+    }, 0)
+
+    return sum;
+  }
+
+  addProduct(product) {
+    const updatedItems = [...this.items];
+    updatedItems.push(product);
+    this.cartItems = updatedItems;
+    // this.items.push(product);
+
+    // this.totalOutput.innerHTML = `<h2>Total: Rp.${1}</h2>`
+    // this.render();
+  }
+  render() {
+    const cartEl = document.createElement('section');
+    cartEl.className = 'cart';
+    cartEl.innerHTML = `
+    <h2>Total: Rp.${0}</h2>
+    <button>Pesan Sekarang</button>
+    `;
+    // Tidak ada dalam costructor
+    this.totalOutput = cartEl.querySelector('h2');
+    return cartEl;
   }
 }
 
@@ -47,12 +94,10 @@ class ProductList {
     )
 
   ]
-  // constructor() {
 
-  // }
 
   render() {
-    const renderHook = document.getElementById('app');
+    // const renderHook = document.getElementById('app');
     const prodList = document.createElement('ul');
     prodList.className = 'product-list';
     for (const prod of this.products) {
@@ -60,9 +105,44 @@ class ProductList {
       const prodEl = productItem.render();
       prodList.append(prodEl);
     }
-    renderHook.append(prodList);
+    // renderHook.append(prodList);
+
+    return prodList;
   }
 }
 
-const productList = new ProductList();
-productList.render();
+class FSW2Shop {
+  render() {
+    const renderHook = document.getElementById('app');
+
+    this.cart = new ShoppingCart();
+    const cartEl = this.cart.render();
+
+    const productList = new ProductList();
+    const prodListEl = productList.render();
+
+    renderHook.append(cartEl);
+    renderHook.append(prodListEl);
+  }
+}
+
+class App {
+  static init() {
+    const shop = new FSW2Shop();
+    shop.render();
+    this.cart = shop.cart;
+
+  }
+
+  static addProductToCart(product) {
+    this.cart.addProduct(product);
+  }
+}
+
+// const productList = new ProductList();
+// productList.render();
+
+// const shop = new FSW2Shop();
+// shop.render();
+
+App.init();
